@@ -29,6 +29,8 @@ const userRouter = require("./router/user");
 app.use("/common", userRouter);
 const homeRouter = require("./router/home");
 app.use("/home", homeRouter);
+const etlRouter = require("./router/etl");
+app.use("/api/etl", etlRouter);
 
 // 定义错误级别中间件
 app.use((err, req, res, next) => {
