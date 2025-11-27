@@ -1,15 +1,15 @@
-<template>
-	<div class="openrank-table">
-		<!-- 筛选器 -->
-		<div class="table-filters">
+﻿<template>
+	<div class="openrank-table" ref="tableWrapperRef" :style="tableStyle">
+		<!-- 绛涢€夊櫒 -->
+		<div class="table-filters" ref="tableFiltersRef">
 			<a-space :size="8">
-				<!-- 排名模式切换 -->
+				<!-- 鎺掑悕妯″紡鍒囨崲 -->
 				<a-radio-group v-model:value="rankMode" button-style="solid" size="small" class="rank-mode-group">
 					<a-radio-button value="month">月度</a-radio-button>
 					<a-radio-button value="year">年度</a-radio-button>
 				</a-radio-group>
 
-				<!-- 年份选择 -->
+				<!-- 骞翠唤閫夋嫨 -->
 				<a-date-picker
 					v-model:value="selectedYear"
 					picker="year"
@@ -21,7 +21,7 @@
 					@change="onYearChange"
 				/>
 
-				<!-- 月份选择（仅月度模式显示） -->
+				<!-- 鏈堜唤閫夋嫨锛堜粎鏈堝害妯″紡鏄剧ず锛?-->
 				<a-date-picker
 					v-if="rankMode === 'month'"
 					v-model:value="selectedMonth"
@@ -37,54 +37,71 @@
 			</a-space>
 		</div>
 
-		<!-- 表格 -->
-		<a-table
-			:columns="columns"
-			:data-source="tableData"
-			:pagination="false"
-			:loading="loading"
-			size="small"
-			class="openrank-table-content"
-		>
-			<template #bodyCell="{ column, record, index }">
-				<template v-if="column.key === 'rank'">
-					<div class="rank-cell" :class="`rank-${index + 1}`">
-						{{ index + 1 }}
-					</div>
+		<!-- 琛ㄦ牸 -->
+		<div class="openrank-table-content" ref="tableContentRef">
+			<a-table
+				:columns="columns"
+				:data-source="tableData"
+				:pagination="false"
+				:loading="loading"
+				size="small"
+				class="openrank-table-core"
+			>
+				<template #bodyCell="{ column, record, index }">
+					<template v-if="column.key === 'rank'">
+						<div class="rank-cell" :class="`rank-${index + 1}`">
+							{{ index + 1 }}
+						</div>
+					</template>
+					<template v-if="column.key === 'project'">
+						<div class="project-cell" :title="record.project">
+							{{ record.project }}
+						</div>
+					</template>
+					<template v-if="column.key === 'openrank'">
+						<div class="openrank-cell">
+							{{ record.openrank }}
+						</div>
+					</template>
 				</template>
-				<template v-if="column.key === 'project'">
-					<div class="project-cell" :title="record.project">
-						{{ record.project }}
-					</div>
-				</template>
-				<template v-if="column.key === 'openrank'">
-					<div class="openrank-cell">
-						{{ record.openrank }}
-					</div>
-				</template>
-			</template>
-		</a-table>
+			</a-table>
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, nextTick, onBeforeUnmount } from 'vue';
 import dayjs, { Dayjs } from 'dayjs';
 import { getOpenRankData } from '../../service';
 
-// 所有项目的OpenRank数据
+// 鎵€鏈夐」鐩殑OpenRank鏁版嵁
 const allProjectsData = ref<Array<any>>([]);
 
-// 排名模式：month或year
+// 鎺掑悕妯″紡锛歮onth鎴杫ear
 const rankMode = ref<'month' | 'year'>('month');
 
-// 选中的年份和月份
+// 閫変腑鐨勫勾浠藉拰鏈堜唤
 const selectedYear = ref<Dayjs>();
 const selectedMonth = ref<Dayjs>();
 
 const loading = ref(false);
 
-// 表格列定义
+// 灏哄 & 鑷€傚簲鐩稿叧
+const tableWrapperRef = ref<HTMLElement | null>(null);
+const tableFiltersRef = ref<HTMLElement | null>(null);
+const tableContentRef = ref<HTMLElement | null>(null);
+const rowHeight = ref(44);
+const bodyHeight = ref(440);
+const fontSize = ref(13);
+const BODY_GAP = 8;
+
+const tableStyle = computed(() => ({
+	'--openrank-row-height': `${rowHeight.value}px`,
+	'--openrank-body-height': `${bodyHeight.value}px`,
+	'--openrank-font-size': `${fontSize.value}px`
+}));
+
+// 琛ㄦ牸鍒楀畾涔?
 const columns = [
 	{
 		title: '序号',
@@ -106,11 +123,11 @@ const columns = [
 	}
 ];
 
-// 表格数据
+// 琛ㄦ牸鏁版嵁
 const tableData = ref<Array<{ project: string; openrank: string }>>([]);
 
 /**
- * 获取所有可用的日期
+ * 鑾峰彇鎵€鏈夊彲鐢ㄧ殑鏃ユ湡
  */
 const getAvailableDates = () => {
 	const dates = new Set<string>();
@@ -124,27 +141,27 @@ const getAvailableDates = () => {
 			});
 		}
 	});
-	return Array.from(dates).sort().reverse(); // 降序排列，最新的在前
+	return Array.from(dates).sort().reverse(); // 闄嶅簭鎺掑垪锛屾渶鏂扮殑鍦ㄥ墠
 };
 
 /**
- * 初始化默认选择最新月份
+ * 鍒濆鍖栭粯璁ら€夋嫨鏈€鏂版湀浠?
  */
 const initDefaultDate = () => {
 	const availableDates = getAvailableDates();
 	if (availableDates.length > 0) {
-		const latestDate = availableDates[0]; // 如: "2025-10"
+		const latestDate = availableDates[0]; // 濡? "2025-10"
 		selectedMonth.value = dayjs(latestDate, 'YYYY-MM');
 		selectedYear.value = dayjs(latestDate, 'YYYY-MM');
 	} else {
-		// 如果没有数据，默认当前月
+		// 濡傛灉娌℃湁鏁版嵁锛岄粯璁ゅ綋鍓嶆湀
 		selectedMonth.value = dayjs();
 		selectedYear.value = dayjs();
 	}
 };
 
 /**
- * 计算月度排名数据
+ * 璁＄畻鏈堝害鎺掑悕鏁版嵁
  */
 const calculateMonthlyRank = (yearMonth: string) => {
 	const rankings: Array<{ project: string; openrank: number }> = [];
@@ -162,7 +179,7 @@ const calculateMonthlyRank = (yearMonth: string) => {
 		}
 	});
 
-	// 排序并取前10
+	// 鎺掑簭骞跺彇鍓?0
 	rankings.sort((a, b) => b.openrank - a.openrank);
 	return rankings.slice(0, 10).map(item => ({
 		project: item.project,
@@ -171,7 +188,7 @@ const calculateMonthlyRank = (yearMonth: string) => {
 };
 
 /**
- * 计算年度排名数据（总和）
+ * 璁＄畻骞村害鎺掑悕鏁版嵁锛堟€诲拰锛?
  */
 const calculateYearlyRank = (year: string) => {
 	const rankings: Array<{ project: string; openrank: number }> = [];
@@ -182,7 +199,7 @@ const calculateYearlyRank = (year: string) => {
 			let yearTotal = 0;
 			let hasData = false;
 
-			// 遍历该年的所有月份
+			// 閬嶅巻璇ュ勾鐨勬墍鏈夋湀浠?
 			Object.keys(openrankData).forEach(date => {
 				if (date.startsWith(year)) {
 					const value = openrankData[date];
@@ -202,7 +219,7 @@ const calculateYearlyRank = (year: string) => {
 		}
 	});
 
-	// 排序并取前10
+	// 鎺掑簭骞跺彇鍓?0
 	rankings.sort((a, b) => b.openrank - a.openrank);
 	return rankings.slice(0, 10).map(item => ({
 		project: item.project,
@@ -211,7 +228,7 @@ const calculateYearlyRank = (year: string) => {
 };
 
 /**
- * 更新表格数据
+ * 鏇存柊琛ㄦ牸鏁版嵁
  */
 const updateTableData = () => {
 	loading.value = true;
@@ -224,32 +241,33 @@ const updateTableData = () => {
 			const year = selectedYear.value.format('YYYY');
 			tableData.value = calculateYearlyRank(year);
 		}
+		nextTick(updateTableLayout);
 		loading.value = false;
 	}, 100);
 };
 
 /**
- * 禁用未来的年份
+ * 绂佺敤鏈潵鐨勫勾浠?
  */
 const disabledYear = (current: Dayjs) => {
 	return current && current.year() > dayjs().year();
 };
 
 /**
- * 禁用未来的月份
+ * 绂佺敤鏈潵鐨勬湀浠?
  */
 const disabledMonth = (current: Dayjs) => {
 	return current && current.isAfter(dayjs());
 };
 
 /**
- * 年份变化
+ * 骞翠唤鍙樺寲
  */
 const onYearChange = () => {
 	if (rankMode.value === 'year') {
 		updateTableData();
 	} else if (selectedMonth.value) {
-		// 月度模式下，年份变化后，调整月份到同一年
+		// 鏈堝害妯″紡涓嬶紝骞翠唤鍙樺寲鍚庯紝璋冩暣鏈堜唤鍒板悓涓€骞?
 		const newMonth = selectedMonth.value.year(selectedYear.value!.year());
 		if (!disabledMonth(newMonth)) {
 			selectedMonth.value = newMonth;
@@ -258,20 +276,51 @@ const onYearChange = () => {
 };
 
 /**
- * 月份变化
+ * 鏈堜唤鍙樺寲
  */
 const onMonthChange = () => {
 	selectedYear.value = selectedMonth.value;
 	updateTableData();
 };
 
-// 监听排名模式变化
+// 鐩戝惉鎺掑悕妯″紡鍙樺寲
 watch(rankMode, () => {
 	updateTableData();
 });
 
 /**
- * 加载所有项目的OpenRank数据
+ * Resize table body so 10 rows always fit
+ */
+const updateTableLayout = () => {
+	requestAnimationFrame(() => {
+		const container = tableContentRef.value;
+		if (!container) return;
+
+		const containerRect = container.getBoundingClientRect();
+		const tableHead = container.querySelector('.ant-table-thead') as HTMLElement | null;
+		const headerHeight = tableHead?.getBoundingClientRect().height ?? 0;
+
+		const availableBodyHeight = Math.max(containerRect.height - headerHeight - BODY_GAP, 0);
+		if (availableBodyHeight <= 0) return;
+
+		const rows = Math.max(tableData.value.length || 0, 10);
+		const idealRowHeight = availableBodyHeight / rows;
+
+		rowHeight.value = idealRowHeight;
+		bodyHeight.value = availableBodyHeight;
+		fontSize.value = Math.min(14, Math.max(11, idealRowHeight * 0.36));
+	});
+};
+
+watch(
+	() => tableData.value.length,
+	() => {
+		nextTick(updateTableLayout);
+	}
+);
+
+/**
+ * 鍔犺浇鎵€鏈夐」鐩殑OpenRank鏁版嵁
  */
 const loadOpenRankData = async () => {
 	loading.value = true;
@@ -281,6 +330,7 @@ const loadOpenRankData = async () => {
 			allProjectsData.value = res.data || [];
 			initDefaultDate();
 			updateTableData();
+			nextTick(updateTableLayout);
 		}
 	} catch (error) {
 		console.error('Failed to load OpenRank data:', error);
@@ -289,9 +339,14 @@ const loadOpenRankData = async () => {
 	}
 };
 
-// 组件挂载时初始化
+// 缁勪欢鎸傝浇鏃跺垵濮嬪寲
 onMounted(() => {
 	loadOpenRankData();
+	window.addEventListener('resize', updateTableLayout);
+});
+
+onBeforeUnmount(() => {
+	window.removeEventListener('resize', updateTableLayout);
 });
 </script>
 
@@ -301,6 +356,7 @@ onMounted(() => {
 	display: flex;
 	flex-direction: column;
 	padding: 8px;
+	padding-bottom: 10px;
 
 	.table-filters {
 		margin-bottom: 12px;
@@ -373,61 +429,69 @@ onMounted(() => {
 	.openrank-table-content {
 		flex: 1;
 		overflow: hidden;
+		display: flex;
 
+		:deep(.ant-table-wrapper),
+		:deep(.ant-spin-nested-loading),
+		:deep(.ant-spin-container),
 		:deep(.ant-table) {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
 			background: transparent;
 			color: #e2e8f0;
+		}
 
-			.ant-table-body {
-				max-height: 500px;
-				overflow-y: auto;
-				overflow-x: hidden;
+		:deep(.ant-table-container) {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
 
-				/* 隐藏滚动条 */
-				&::-webkit-scrollbar {
-					width: 0;
-					height: 0;
-				}
+		:deep(.ant-table-thead > tr > th) {
+			background: rgba(15, 23, 42, 0.8);
+			border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+			color: #38bdf8;
+			font-weight: 600;
+			padding: 12px 8px;
+		}
 
-				scrollbar-width: none;
-				-ms-overflow-style: none;
+		:deep(.ant-table-body) {
+			flex: 1;
+			max-height: none;
+			height: var(--openrank-body-height);
+			overflow: hidden;
+		}
+
+		:deep(.ant-table-tbody > tr) {
+			background: rgba(15, 23, 42, 0.4);
+			height: var(--openrank-row-height);
+
+			&:hover > td {
+				background: rgba(56, 189, 248, 0.1);
 			}
 
-			.ant-table-thead > tr > th {
-				background: rgba(15, 23, 42, 0.8);
-				border-bottom: 1px solid rgba(56, 189, 248, 0.3);
-				color: #38bdf8;
-				font-weight: 600;
-				padding: 12px 8px;
+			> td {
+				border-bottom: 1px solid rgba(56, 189, 248, 0.1);
+				padding: 8px;
+				vertical-align: middle;
+				font-size: var(--openrank-font-size);
+				line-height: 1.2;
 			}
+		}
 
-			.ant-table-tbody > tr {
-				background: rgba(15, 23, 42, 0.4);
+		:deep(.ant-table-placeholder) {
+			background: rgba(15, 23, 42, 0.4);
+			color: #64748b;
 
-				&:hover > td {
-					background: rgba(56, 189, 248, 0.1);
-				}
-
-				> td {
-					border-bottom: 1px solid rgba(56, 189, 248, 0.1);
-					padding: 14px 8px;
-					vertical-align: middle;
-				}
-			}
-
-			.ant-table-placeholder {
-				background: rgba(15, 23, 42, 0.4);
+			.ant-empty-description {
 				color: #64748b;
-
-				.ant-empty-description {
-					color: #64748b;
-				}
 			}
 		}
 
 		.rank-cell {
 			font-weight: 600;
-			font-size: 14px;
+			font-size: calc(var(--openrank-font-size) + 1px);
 
 			&.rank-1 {
 				color: #fbbf24;
@@ -456,5 +520,7 @@ onMounted(() => {
 		}
 	}
 }
-
 </style>
+
+
+
