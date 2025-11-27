@@ -15,7 +15,7 @@ export default function (props?: {
 	const chartRef = shallowRef<EChartsType>();
 	const container = ref<HTMLDivElement | undefined>();
 	const chart = reactive<LineChartType['chart']>({
-		selectValue: [4, 8, 68],
+		selectValue: [38, 41, 68],
 		initChart,
 		resizeChart,
 		extraOption: {}
@@ -159,6 +159,9 @@ export default function (props?: {
 		const openRankData: EChartsCoreOption[] = [];
 		nodes &&
 			nodes.forEach((item: any) => {
+				// 只显示selectValue中指定的项目ID
+				if (!chart.selectValue.includes(item.project_id)) return;
+
 				const data: DateItem = [];
 				dateList.forEach(key => {
 					data.push([key, item[type][key] || 0]);

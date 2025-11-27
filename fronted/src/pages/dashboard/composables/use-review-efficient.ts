@@ -15,7 +15,7 @@ export default function (props?: {
 	const chartRef = shallowRef<EChartsType>();
 	const container = ref<HTMLDivElement | undefined>();
 	const chart = reactive<LineChartType['chart']>({
-		selectValue: [4, 8, 68],
+		selectValue: [38, 41, 68],
 		initChart,
 		resizeChart,
 		extraOption: {}
@@ -144,6 +144,9 @@ export default function (props?: {
 		const preiData: EChartsCoreOption[] = [];
 		nodes &&
 			nodes.forEach((item: any) => {
+				// 只显示selectValue中指定的项目ID
+				if (!chart.selectValue.includes(item.project_id)) return;
+
 				const data: DateItem = [];
 				dateList.forEach(key => {
 					data.push([key, item['prei'][key] || 0]);
@@ -162,9 +165,9 @@ export default function (props?: {
 		chart.extraOption = {
 			yAxis: {
 				type: 'value',
-				min: 0,
+				min: 60,
 				max: 100,
-				interval: 20,
+				interval: 10,
 				axisLabel: {
 					fontSize: getHtmlFontPX(0.75)
 				},

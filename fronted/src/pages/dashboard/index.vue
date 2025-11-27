@@ -12,13 +12,13 @@
 					<a-col v-bind="leftRightCol" class="chart-content-col">
 						<a-row class="chart-content-left">
 							<a-col class="chart-content-left-item" :span="24">
-								<ModuleItem title="PREI" :loading="initLoading">
-									<div :ref="preiChart.container" class="chart-container" />
+								<ModuleItem title="OpenRank项目榜" :loading="initLoading">
+									<OpenRankTable />
 								</ModuleItem>
 							</a-col>
 							<a-col class="chart-content-left-item" :span="24">
-								<ModuleItem title="OpenRank" :loading="initLoading">
-									<div :ref="openRankChart.container" class="chart-container"></div>
+								<ModuleItem title="PREI" :loading="initLoading">
+									<div :ref="preiChart.container" class="chart-container" />
 								</ModuleItem>
 							</a-col>
 						</a-row>
@@ -118,6 +118,7 @@ import ListHeader from './components/list-header/index.vue';
 import IndexNum from './components/index-num/index.vue';
 import RadarList from './components/radar-list/index.vue';
 import FloatingMenu from '@/components/FloatingMenu.vue';
+import OpenRankTable from './components/openrank-table/index.vue';
 
 import useOpenRank from './composables/use-open-rank';
 import useReviewEfficient from './composables/use-review-efficient';

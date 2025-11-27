@@ -115,9 +115,31 @@ const calculateAverage = (values) => {
   const sum = values.reduce((total, value) => total + value, 0);
   return (sum / values.length).toFixed(2);
 };
+
+// 获取OpenRank排名数据
+exports.getOpenRankData = (req, res) => {
+  const sql = `select project_id, company_name, project_name, openrank from github`;
+  db.query(sql, (err, results) => {
+    if (err) return res.cc(err);
+
+    const dataRes = results.map((item) => ({
+      project_id: item.project_id,
+      project_name: item.project_name,
+      company_name: item.company_name,
+      openrank: JSON.parse(item.openrank),
+    }));
+
+    return res.send({
+      msg: "操作成功",
+      data: dataRes,
+      code: 200,
+    });
+  });
+};
+
 // 获取初始化数据
 exports.getInitData = (req, res) => {
-  const sql = `select * from github where project_id in (4, 8, 68)`;
+  const sql = `select * from github where project_id in (38, 41, 68)`;
   db.query(sql, (err, results) => {
     if (err) return res.cc(err);
     const dataRes = results.map((item) => ({

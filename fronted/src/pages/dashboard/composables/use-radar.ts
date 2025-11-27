@@ -127,6 +127,7 @@ export default function (): RadarChartType {
 	function initChart(nodes: GitHubItem[]): any {
 		if (!container.value) return;
 
+		// 雷达图初始化时显示传入的nodes（通常是初始数据）
 		const radarData: RadarSeriesOption['data'] = [];
 		nodes &&
 			nodes.forEach((item: any) => {
@@ -138,7 +139,11 @@ export default function (): RadarChartType {
 				};
 				radarData.push(obj);
 			});
-		calcMax();
+
+		if (radarData.length > 0) {
+			calcMax();
+		}
+
 		const option = getOption();
 		(option.series as RadarSeriesOption).data?.push(...radarData);
 		chartRef.value = echarts.init(container.value);

@@ -1,5 +1,5 @@
 const express = require("express");
-const { getOptions, getProjectData, getGithubData, getAllData, getInitData } = require("../router_handler/home");
+const { getOptions, getProjectData, getGithubData, getAllData, getInitData, getOpenRankData } = require("../router_handler/home");
 
 const router = express.Router();
 
@@ -13,5 +13,7 @@ router.get("/getGithubData", getGithubData);
 router.get("/getAllData", getAllData);
 
 router.get("/getInitData", getInitData);
+
+router.get("/getOpenRankData", getOpenRankData);
 
 module.exports = router;

@@ -15,3 +15,7 @@ export const getGithubData = (params: { page: number; page_size: number }) => {
 export const getProjectData = (params: { type: string; project_id: number }) => {
 	return GET('/home/getProjectData', params);
 };
+
+export const getOpenRankData = () => {
+	return GET('/home/getOpenRankData');
+};
