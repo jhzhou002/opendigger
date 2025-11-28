@@ -107,19 +107,19 @@ const columns = [
 		title: '序号',
 		key: 'rank',
 		width: 80,
-		align: 'center'
+		align: 'center' as const
 	},
 	{
 		title: '项目',
 		key: 'project',
 		ellipsis: true,
-		align: 'center'
+		align: 'center' as const
 	},
 	{
 		title: 'OpenRank',
 		key: 'openrank',
 		width: 120,
-		align: 'center'
+		align: 'center' as const
 	}
 ];
 

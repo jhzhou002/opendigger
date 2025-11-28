@@ -75,8 +75,8 @@ export default function (): RadarChartType {
 				axisName: {
 					color: ThemeColor.chartFontColor,
 					fontSize: getHtmlFontPX(0.75),
-					formatter: (value: string) => {
-						return value;
+					formatter: (value?: string) => {
+						return value || '';
 					}
 				},
 				center: ['50%', '56%'],

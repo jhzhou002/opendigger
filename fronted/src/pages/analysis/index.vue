@@ -293,9 +293,9 @@ const exportToPDF = async () => {
 
 		// 配置html2pdf选项
 		const opt = {
-			margin: [15, 15, 15, 15],
+			margin: [15, 15, 15, 15] as [number, number, number, number],
 			filename: fileName,
-			image: { type: 'jpeg', quality: 0.98 },
+			image: { type: 'jpeg' as const, quality: 0.98 },
 			html2canvas: {
 				scale: 2,
 				useCORS: true,
@@ -304,7 +304,7 @@ const exportToPDF = async () => {
 			jsPDF: {
 				unit: 'mm',
 				format: 'a4',
-				orientation: 'portrait'
+				orientation: 'portrait' as const
 			},
 			pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
 		};
