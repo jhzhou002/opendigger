@@ -213,7 +213,8 @@ function rafThrottle(fn: Function) {
 }
 
 const handleScroll = rafThrottle(() => {
-	const { scrollTop } = contentRef.value!;
+	if (!contentRef.value) return;
+	const { scrollTop } = contentRef.value;
 	state.startIndex = binarySearch(positions.value, scrollTop);
 
 	if (
@@ -246,10 +247,13 @@ const binarySearch = (list: IPosInfo[], value: number) => {
 const handleSetPosition = () => {
 	props.dataSource.length && initPosition();
 	nextTick(() => {
-		if (itemRef.value) {
+		if (itemRef.value && itemRef.value.length > 0) {
 			state.viewHeight = contentRef.value ? contentRef.value.offsetHeight : 0;
 			// 拿数组第一项计算最大
-			state.maxCount = Math.ceil(state.viewHeight / itemRef.value[0].offsetHeight) + 1;
+			const firstItem = itemRef.value[0];
+			if (firstItem) {
+				state.maxCount = Math.ceil(state.viewHeight / firstItem.offsetHeight) + 1;
+			}
 		}
 		props.dataSource.length && setPosition();
 	});

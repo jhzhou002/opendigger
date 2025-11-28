@@ -26,9 +26,9 @@ app.use((req, res, next) => {
 
 // 路由模块
 const userRouter = require("./router/user");
-app.use("/common", userRouter);
+app.use("/api/common", userRouter);
 const homeRouter = require("./router/home");
-app.use("/home", homeRouter);
+app.use("/api/home", homeRouter);
 const etlRouter = require("./router/etl");
 app.use("/api/etl", etlRouter);
 
