@@ -2,6 +2,7 @@ import MainLayout from '@/layouts/MainLayout.vue';
 import Dashboard from '@/pages/dashboard/index.vue';
 import Search from '@/pages/search/index.vue';
 import Analysis from '@/pages/analysis/index.vue';
+import MetricsGuide from '@/pages/metrics-guide/index.vue';
 
 const routes = [
 	{
@@ -14,7 +15,7 @@ const routes = [
 		name: 'Dashboard',
 		component: Dashboard,
 		meta: {
-			title: '开源数据发展趋势-可视化大屏'
+			title: 'OpenInsight - 可视化大屏'
 		}
 	},
 	// 其他页面使用 MainLayout
@@ -27,7 +28,7 @@ const routes = [
 				name: 'Search',
 				component: Search,
 				meta: {
-					title: '开源数据发展趋势-项目搜索'
+					title: 'OpenInsight - 项目搜索'
 				}
 			},
 			{
@@ -35,7 +36,15 @@ const routes = [
 				name: 'Analysis',
 				component: Analysis,
 				meta: {
-					title: '开源数据发展趋势-项目分析'
+					title: 'OpenInsight - 项目分析'
+				}
+			},
+			{
+				path: 'metrics-guide',
+				name: 'MetricsGuide',
+				component: MetricsGuide,
+				meta: {
+					title: 'OpenInsight - 指标说明'
 				}
 			}
 		]

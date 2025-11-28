@@ -324,7 +324,7 @@ ${JSON.stringify(projectsSummary, null, 2)}
 
     // 调用通义千问API (流式输出)
     const stream = await client.chat.completions.create({
-      model: "qwen-plus",
+      model: "qwen3-max",
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt },

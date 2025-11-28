@@ -8,7 +8,7 @@ const router = createRouter({
 
 const setTitle = (to: RouteLocationNormalized) => {
 	// 设置页面标题
-	document.title = (to.meta && (to.meta.title as string)) || '开源数据发展趋势';
+	document.title = (to.meta && (to.meta.title as string)) || 'OpenInsight';
 };
 
 // 路由拦截
